@@ -161,7 +161,6 @@ The top five softmax probabilities for each test image by my model are listed be
 | 0%	      			| Keep right			 						|
 | 0%				    | Roundabout mandatory         						|
 
-For the second image ... 
 
 ### (Optional) Visualizing the Neural Network 
 Eight arbitrary feature maps from the outputs of each convolutional layers are shown below. The observation is that the inner network feature maps react with high activation to the sign's boundary outline or to the contrast in the sign's painted symbol.
