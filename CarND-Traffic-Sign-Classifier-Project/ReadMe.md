@@ -1,8 +1,8 @@
-#**Traffic Sign Recognition** 
+# **Traffic Sign Recognition** 
 
-##Summary
+## Summary
 
-###In this project, a classifier to recognize traffic sign was built based on Convolutional Neural Networks, which is a project of the Udacity Self-driving Cars Nanodegree program. The model was trained on a fraction of the German Traffic Sign dataset, which is provided as pickled files by the Self-driving car program. The final validation accuracy of our model was 97%, and the test accuracy was 98%. Six images downloaded from the internet were also used to test the model, and a accuracy of 66.7% was achieved.
+### In this project, a classifier to recognize traffic sign was built based on Convolutional Neural Networks, which is a project of the Udacity Self-driving Cars Nanodegree program. The model was trained on a fraction of the German Traffic Sign dataset, which is provided as pickled files by the Self-driving car program. The final validation accuracy of our model was 97%, and the test accuracy was 98%. Six images downloaded from the internet were also used to test the model, and a accuracy of 66.7% was achieved.
 ---
 
 **The document includes following sections**
@@ -19,17 +19,17 @@
 [raw_hist]: ./img_writeup/hist_raw.png "Hist Trainging y"
 [raw_class_img]: ./img_writeup/raw-class-42.png "Raw training images"
 [augm_class_img]: ./img_writeup/augm-class-42.png "Augmented images"
-[augm_demo]: ./img_writeup/Demo_augmentations.png "Augmentation demo"
-[train_conv]: ./img_writeup/ConvTrain.png "Training convergence"
+[augm_demo]: ./img_writeup/Demo_augmentations.PNG "Augmentation demo"
+[train_conv]: ./img_writeup/ConvTrain.PNG "Training convergence"
 [test_img]: ./img_writeup/test-imgs.png "test_img"
-[feat_map_1]: ./img_writeup/featMap_1.png "Feature map conv layer 1"
-[feat_map_2]: ./img_writeup/featMap_2.png "Feature map conv layer 2"
-[feat_map_3]: ./img_writeup/featMap_3.png "Feature map conv layer 3"
-[feat_map_4]: ./img_writeup/featMap_4.png "Feature map conv layer 4"
-[feat_map_5]: ./img_writeup/featMap_5.png "Feature map conv layer 5"
-[feat_map_6]: ./img_writeup/featMap_6.png "Feature map conv layer 6"
+[feat_map_1]: ./img_writeup/featMap_1.PNG "Feature map conv layer 1"
+[feat_map_2]: ./img_writeup/featMap_2.PNG "Feature map conv layer 2"
+[feat_map_3]: ./img_writeup/featMap_3.PNG "Feature map conv layer 3"
+[feat_map_4]: ./img_writeup/featMap_4.PNG "Feature map conv layer 4"
+[feat_map_5]: ./img_writeup/featMap_5.PNG "Feature map conv layer 5"
+[feat_map_6]: ./img_writeup/featMap_6.PNG "Feature map conv layer 6"
 
-###Data Set Summary & Exploration
+### Data Set Summary & Exploration
 
 The provided dataset was explored with Pandas. Images of the dataset have been resized to 32x32, and all of them are RGB color images. There are 34799 training images, 12630 validation validation images, and 4410 test images. There are 43 unique categories of traffic signs in the data. Below is the histogram showing size of each category in the training data, which indicates that the dataset is asymmetric. Some categories have more than 1000 examples, while others have less than 200 examples.
 
@@ -51,7 +51,7 @@ My assumption is that the training data set reflects road conditions, and the ro
 
 Preprocessing is also required for images to be input to the neural network. The basic step is normalization. Other techniques, such as converting the original RGB images to grayscale or applying histogram equalization to images, have also been tested. However, no significant improvement has been observed with grascale or histogram equalized images. Thus, simple normalization is the only preprocessing applied in this study. The performance of my final model is obtained from image augmentation and the network architecture.
 
-###Model Architecture Design
+### Model Architecture Design
 
 The layer pattern of my ConvNet model is as follows
 
@@ -93,7 +93,7 @@ The Adam optimizer was used to train this model. The learning rate is 2e-4 and t
 
 I started the architecture design with LeNet, because it is the very first successful ConvNet for image classification. I have achieved 89-91% validation accuracy with LeNet on the original training data. At the moment, the training accuracy quickly converged to 100%, which indicates overfitting. My first improvement was testing dropout layers at different depth of LeNet, which ends up with a dropout layer following every other layers. This improvement quickly help my model achieve 93-94% accuracy. Then with two more convolutional layers and image augmentation, I finalized my model to the current architecture.
 
-###Test a Model on New Images
+### Test a Model on New Images
 
 Six test images were downloaded from the internet to test my model as shown below. All of the six images are relatively easy to be recognized, since they are in overall clearly taken. Although the first (true class id 11) and sixth (true class id 33) are not in the front view, but this have been incoorporated in the augmented data by applying affine transform. The prediction on the second (true class id 19) and fifth (true class id 41) are incorrect. This may be explained by the asymmetry of the augmented data, since the proportion of Class 19 and Class 41 are low. It may be inapproprate to keep the proportion of classes in the augmented data. My improvement will be training the model with symmetric augmented data.
 
