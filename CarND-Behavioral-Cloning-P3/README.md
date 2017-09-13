@@ -7,7 +7,7 @@
 
 |                Lake Track                |
 | :--------------------------------------: |
-| [![Lake Track](./img_writeup/raw_center.png)](https://youtu.be/Q-5QoDszvWQ |
+| [![Lake Track](./img_writeup/raw_center.png)](https://youtu.be/Q-5QoDszvWQ) |
 | [YouTube Link](https://youtu.be/Q-5QoDszvWQ) |
 
 ---
@@ -54,8 +54,10 @@ The steering angle of the center camera was recorded along with the photos. Exam
 
 **Center Camera**
 ![alt text](./img_writeup/raw_center.png)
+
 **Left Camera**
 ![alt text](./img_writeup/raw_left.png)
+
 **Right Camera**
 ![alt text](./img_writeup/raw_right.png)
 
