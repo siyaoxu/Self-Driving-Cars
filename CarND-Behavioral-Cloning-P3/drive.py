@@ -5,6 +5,7 @@ import os
 import shutil
 
 import numpy as np
+import cv2
 import socketio
 import eventlet
 import eventlet.wsgi
@@ -60,7 +61,16 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
+        # turn the image to a numpy array
         image_array = np.asarray(image)
+        # resize the image
+        image_array = cv2.resize(cv2.cvtColor(image_array,cv2.COLOR_RGB2HSV),(200,128))
+        # cv2.resize(cv2.cvtColor(image_array,cv2.COLOR_RGB2YUV),(256,128))
+        # crop the image to our model's input
+        image_array = image_array[46:110,:,:]
+#        from IPython.core.debugger import Tracer; Tracer()()
+
+        # make prediction
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
