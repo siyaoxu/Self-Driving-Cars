@@ -52,14 +52,8 @@ We can collect data using the Training Mode of the simulator by capturing photos
 
 The steering angle of the center camera was recorded along with the photos. Examples of pictures of three cameras taken at the same time are shown below.
 
-**Center Camera**
-![alt text](./img_writeup/raw_center.png)
-
-**Left Camera**
-![alt text](./img_writeup/raw_left.png)
-
-**Right Camera**
-![alt text](./img_writeup/raw_right.png)
+|**Center Camera**|**Left Camera**|**Right Camera**|
+|![alt text](./img_writeup/raw_center.png)|![alt text](./img_writeup/raw_left.png)|![alt text](./img_writeup/raw_right.png)|
 
 I only collect photos fron three to four rounds on the track, since image augmentation will be applied. While driving on the track, I constantly changed the car from the border of the track to the center. More data steering the car back to the center were recorded in this way. The images have been cropped to focus on the road, and resized to reduce the dimension of the data. The cropped center image above is shown below. In addition, a normalization layer was set in the model to normalize the input image.
 
