@@ -1,6 +1,6 @@
-#**Udacity Self-driving Cars NanoDegree Project 3: Behavioral Cloning** 
+# **Udacity Self-driving Cars NanoDegree Project 3: Behavioral Cloning** 
 
-##Summary
+## Summary
 
 **This is my work for the Behavioral Cloning project of the Udacity Self-driving Cars Nanodegree. A ConvNet-based model was built to autonomously predict steering of a simulated car. The architecture of this model is based on [Nvidia's End to End Learning for Self-Driving Cars](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). However, several adjustments have been made on the architecture to improve the performance on my dataset, and were documented in this documented. Although Udacity has provided some data, I decided to collect my own dataset using Udacity's [car simulator](https://github.com/udacity/self-driving-car-sim). In this project, I have generated a very small dataset of 2700 images on purpose, and augmented it with several data augmentation strategies to train my model. My model has been tested on the basic track provided in the simulator, indicating that data augmentatation can stretch the limit of a small dataset. Results of the model are shown below. This model does not make too far on the challenge track, which is longer and with more sharp turnings. Data augmentataion cannot help on this complex problem, and a much larger dataset are required.**
 
@@ -12,7 +12,7 @@
 
 ---
 
-##Project Description
+## Project Description
 
 This project includes:
 * Data Collection and Preprocessing
@@ -52,9 +52,9 @@ We can collect data using the Training Mode of the simulator by capturing photos
 
 The steering angle of the center camera was recorded along with the photos. Examples of pictures of three cameras taken at the same time are shown below.
 
-|**Center Camera**                        |**Left Camera**                        |**Right Camera**                        |
-|-----------------------------------------|---------------------------------------|----------------------------------------|
-|![alt text](./img_writeup/raw_center.png)|![alt text](./img_writeup/raw_left.png)|![alt text](./img_writeup/raw_right.png)|
+|**Left Camera**                          |**Center Camera**                        |**Right Camera**                        |
+|-----------------------------------------|-----------------------------------------|----------------------------------------|
+|![alt text](./img_writeup/raw_left.png)  |![alt text](./img_writeup/raw_center.png)|![alt text](./img_writeup/raw_right.png)|
 
 I only collect photos fron three to four rounds on the track, since image augmentation will be applied. While driving on the track, I constantly changed the car from the border of the track to the center. More data steering the car back to the center were recorded in this way. The images have been cropped to focus on the road, and resized to reduce the dimension of the data. The cropped center image above is shown below. In addition, a normalization layer was set in the model to normalize the input image.
 
