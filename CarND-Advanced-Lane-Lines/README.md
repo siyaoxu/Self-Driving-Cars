@@ -54,14 +54,17 @@ The camera calibration and image undistortion are demonstrated on the provided t
 I have used the combination of following filters to extract lane lines from an input image.
 
 * Sobel filters in X and Y direction
+
 |              sobel filter x              |              sobel filter y              |
 | :--------------------------------------: | :--------------------------------------: |
 | <img src="./output_images/straight_lines1_sobelx.png" width = 250> | <img src="./output_images/straight_lines1_sobely.png" width = 250> |
 * The magnitude and direction of the gradient
+
 |          magnitude of gradient           |          direction of gradient           |
 | :--------------------------------------: | :--------------------------------------: |
 | <img src="./output_images/straight_lines1_mag_grad_img.png" width = 250> | <img src="./output_images/straight_lines1_dir_grad_img.png" width = 250> |
 * The H and S channels of the image in HLS space
+
 |              HLS S channel               |              HLS H channel               |
 | :--------------------------------------: | :--------------------------------------: |
 | <img src="./output_images/straight_lines1_hls_s_img.png" width = 250> | <img src="./output_images/straight_lines1_hls_h_img.png" width = 250> |
