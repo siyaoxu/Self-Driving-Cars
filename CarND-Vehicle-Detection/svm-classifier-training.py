@@ -1,11 +1,13 @@
 import numpy as np
 import glob
+import fnmatch
+import os
 from time import time
 import cv2
 from scipy.stats import uniform
 from skimage.feature import hog
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV,GridSearchCV
 from sklearn import svm
 import pickle
 from utils import *
@@ -27,8 +29,11 @@ def report(results, n_top=3):
 
 if __name__ == "__main__":
     # define paths to the dataset
-    car_path = './dataset/vehicles/**/*.png'
-    noncar_path = './dataset/non-vehicles/**/*.png'
+#    car_path = './dataset/vehicles/**/*.png'
+#    noncar_path = './dataset/non-vehicles/**/*.png'
+    car_path = './dataset/vehicles/'
+    noncar_path = './dataset/non-vehicles/'
+
     # define parameters for feature extraction
     cspace = 'YUV'
     spatial_size = (32,32)
@@ -38,14 +43,14 @@ if __name__ == "__main__":
     pix_per_cell = 8
     cell_per_block = 2
     hog_channel = 'ALL'
-    
+
     # define parameters for model selection
- #   parameters = {'kernel':('linear', 'rbf', 'poly', 'sigmoid'), 
- #                 'C':uniform(loc=1e-4,scale=1e4)}
- #   n_iter_search = 1000
-    parameters = {'kernel':('linear', 'rbf', 'poly', 'sigmoid'), 
+#    parameters = {'kernel':('linear', 'rbf', 'poly', 'sigmoid'),
+#                  'C':uniform(loc=1e-4,scale=1e4)}
+#    n_iter_search = 1000
+    parameters = {'kernel':('linear', 'rbf', 'poly', 'sigmoid'),
                   'C':[1e-4, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4]}
-    
+
     # define model name
     output_file = './svc-clf.sav'
 
@@ -53,11 +58,12 @@ if __name__ == "__main__":
     print('Loading the dataset ...')
     cars = load_data(car_path)
     noncars = load_data(noncar_path)
+
     # print data summary
     print('dataset loaded')
     data_summary = data_look(cars, noncars)
     print(data_summary)
-    
+
     # prepare X and y
     print()
     print('Preparing features ...')
@@ -77,7 +83,7 @@ if __name__ == "__main__":
     print('feature and labels generated.')
     print('feature vector shape:', scaled_X.shape)
     print('label vector shape:', scaled_X.shape)
-    
+
     # training the classifier
     # Split up data into randomized training and test sets
     print()
@@ -87,15 +93,15 @@ if __name__ == "__main__":
         scaled_X, y, test_size=0.2, random_state=rand_state)
     print('X_train shape:',X_train.shape, 'y_train shape:', y_train.shape)
     print('X_test shape:',X_test.shape, 'y_test shape:', y_test.shape)
-    
-    
+
+
     # model selection
-    # use a linear SVC 
+    # use a linear SVC
     svc = svm.SVC(random_state = rand_state)
     # use randomized search for parameter tuning
 #    clf = RandomizedSearchCV(svc, param_distributions=parameters,
-#                                   n_iter=n_iter_search, verbose=1, n_jobs=-1)
-    clf = GridSearchCV(svc, param_grid=parameters, verbose=2, n_jobs=-1)
+#                                   n_iter=n_iter_search, verbose=10, n_jobs=-1)
+    clf = GridSearchCV(svc, param_grid=parameters, verbose=10, n_jobs=-1)
     # start tuning
     print()
     print('Selecting model parameters ...')
@@ -109,11 +115,11 @@ if __name__ == "__main__":
     print("GridSearchCV took %.2f seconds for %d candidate parameter settings."
           % (time() - start, len(clf.cv_results_['params'])))
     report(clf.cv_results_)
-    
+
     # print the test error
     print()
     print('Accuracy on test data:',clf.score(X_test, y_test))
-    
+
     # save the classifier
     print()
     print('Saving model ...')
