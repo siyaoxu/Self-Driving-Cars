@@ -1,14 +1,16 @@
 import numpy as np
 import glob
+import fnmatch
+import os
 from time import time
 import cv2
 from scipy.stats import uniform
 from skimage.feature import hog
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn import svm
 import pickle
-from utils import *
+from vehicle_detection_utils import *
 
 def report(results, n_top=3):
     '''
@@ -27,25 +29,23 @@ def report(results, n_top=3):
 
 if __name__ == "__main__":
     # define paths to the dataset
-    car_path = './dataset/vehicles/**/*.png'
-    noncar_path = './dataset/non-vehicles/**/*.png'
+    car_path = './dataset/vehicles/'
+    noncar_path = './dataset/non-vehicles/'
+
     # define parameters for feature extraction
-    cspace = 'YUV'
+    cspace = 'LUV'
     spatial_size = (32,32)
     hist_bins = 32
     hist_range = (0,256)
-    orient = 9
-    pix_per_cell = 8
+    orient = 8
+    pix_per_cell = 12
     cell_per_block = 2
     hog_channel = 'ALL'
-    
+
     # define parameters for model selection
- #   parameters = {'kernel':('linear', 'rbf', 'poly', 'sigmoid'), 
- #                 'C':uniform(loc=1e-4,scale=1e4)}
- #   n_iter_search = 1000
-    parameters = {'kernel':('linear', 'rbf', 'poly', 'sigmoid'), 
-                  'C':[1e-4, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4]}
-    
+    parameters = {'C':uniform(loc=1e-4,scale=1e4)}
+    n_iter_search = 30
+
     # define model name
     output_file = './svc-clf.sav'
 
@@ -53,11 +53,12 @@ if __name__ == "__main__":
     print('Loading the dataset ...')
     cars = load_data(car_path)
     noncars = load_data(noncar_path)
+
     # print data summary
     print('dataset loaded')
     data_summary = data_look(cars, noncars)
     print(data_summary)
-    
+
     # prepare X and y
     print()
     print('Preparing features ...')
@@ -71,13 +72,13 @@ if __name__ == "__main__":
                             hist_bins, hist_range,
                             orient, pix_per_cell, cell_per_block, vis=False, feature_vec=True, hog_channel=hog_channel)
     X = createX([car_features, notcar_features], normalize = False)
-    scaled_X = createX([car_features, notcar_features], normalize = True)
+    scaled_X, X_scaler = createX([car_features, notcar_features], normalize = True)
     # generate labels
     y = createY(car_features, notcar_features)
     print('feature and labels generated.')
     print('feature vector shape:', scaled_X.shape)
     print('label vector shape:', scaled_X.shape)
-    
+
     # training the classifier
     # Split up data into randomized training and test sets
     print()
@@ -87,35 +88,33 @@ if __name__ == "__main__":
         scaled_X, y, test_size=0.2, random_state=rand_state)
     print('X_train shape:',X_train.shape, 'y_train shape:', y_train.shape)
     print('X_test shape:',X_test.shape, 'y_test shape:', y_test.shape)
-    
-    
+
+
     # model selection
-    # use a linear SVC 
-    svc = svm.SVC(random_state = rand_state)
+    # use a linear SVC
+    svc = svm.LinearSVC(random_state = rand_state)
     # use randomized search for parameter tuning
-#    clf = RandomizedSearchCV(svc, param_distributions=parameters,
-#                                   n_iter=n_iter_search, verbose=1, n_jobs=-1)
-    clf = GridSearchCV(svc, param_grid=parameters, verbose=2, n_jobs=-1)
+    clf = RandomizedSearchCV(svc, param_distributions=parameters,
+                                   n_iter=n_iter_search, verbose=10, n_jobs=-1)
     # start tuning
     print()
     print('Selecting model parameters ...')
-#    print('iterations:',n_iter_search)
+    print('iterations:',n_iter_search)
     print('parameters:',parameters)
     start = time()
     clf.fit(X_train, y_train)
     print()
-#    print("RandomizedSearchCV took %.2f seconds for %d candidates"
-#          " parameter settings." % ((time() - start), n_iter_search))
-    print("GridSearchCV took %.2f seconds for %d candidate parameter settings."
-          % (time() - start, len(clf.cv_results_['params'])))
+    print("RandomizedSearchCV took %.2f seconds for %d candidates"
+          " parameter settings." % ((time() - start), n_iter_search))
     report(clf.cv_results_)
-    
+
     # print the test error
     print()
     print('Accuracy on test data:',clf.score(X_test, y_test))
-    
+
     # save the classifier
     print()
     print('Saving model ...')
-    pickle.dump(clf, open(output_file, 'wb'))
+    pickle.dump([clf,X_scaler,cspace,spatial_size,hist_bins,hist_range,orient,pix_per_cell,cell_per_block,hog_channel], open(output_file, 'wb'))
     print('model saved at:', output_file)
+    
