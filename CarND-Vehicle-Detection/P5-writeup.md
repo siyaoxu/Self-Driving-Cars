@@ -1,5 +1,5 @@
 ## Project 5 - Vehicle Detection
-**This is [the final project for Term 1 of Udacity Self-Driving Cars Nanodegree](https://github.com/udacity/CarND-Vehicle-Detection). In this project, I have developed a vehicle detection pipeline using Scikit-Image, OpenCV, Scikit-learn, scipy and numpy, in which following steps are included**
+**This is the final project for Term 1 of Udacity Self-Driving Cars Nanodegree [[here]](https://github.com/udacity/CarND-Vehicle-Detection). In this project, I have developed a vehicle detection pipeline using Scikit-Image, OpenCV, Scikit-learn, scipy and numpy, in which following steps are included**
 
 * **Feature extraction using Histograms of Color, Spatial Binning of images, and Histogram of Oriented Gradients (HOG)**
 * **Feature normalization**
@@ -93,7 +93,7 @@ False positive detection is implemented in functions `vehDetect()`, `addHeat()`,
 
 We can see vehicles have been successfully detected, but the left sidewall of the highway, and yellow lane lines have been incorrectly predicted as vehicles. Since the incorrect predictions are normally low in terms the density in the heat map, we can simply filter those region with a threshold. This threshold is also significant to our results. A threshold that is too low will not filter out incorrect predictions, while a high threshold will filter correct predictions. I have used 2 in `video_detection.py`, which has given me a good result along with other parameters.
 
-#### Histric Heatmap
+#### Historic Heatmap
 Filtering heat maps along will not generate satisfiying results, because there are still incorrect predictions remained in every one or two frames of a video. These incorrect predictions randomly appears, hence it is unlikly that they appear in two consecutive frames and in similar regions. I have defined a `Heatmap` class in `heat.py` to store identified objects in the latest `n` frames, and the prediction for each new frame is obtaind by filtering the average heatmap of the latest `n` frames. This strategy has effectively eliminated the incorrect predictions in my results. My choice of `n` is 30.
 
 #### Pipeline
