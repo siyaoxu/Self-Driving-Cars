@@ -4,6 +4,7 @@ import scipy as sp
 import glob
 import matplotlib.pyplot as plt
 from moviepy.editor import VideoFileClip
+from heat import Heatmap
 from lane_detection_utils import *
 from vehicle_detection_utils import *
 from line import Line
@@ -60,7 +61,7 @@ hog_feat = True # HOG features on or off
 # xy_overlap = (0.8,0.8)
 y_start_stops = [[400, 500],[420, 550],[450, 600],[480, None]] # Min and max in y to search in slide_window()
 xy_windows = [(60,60),(70,70),(100,100),(130,130)]
-xy_overlap = (0.6,0.6)
+xy_overlap = (0.7,0.7)
 
 # load the svc classifier
 with warnings.catch_warnings():
@@ -77,7 +78,9 @@ orient = models[6]
 pix_per_cell = models[7]
 cell_per_block = models[8]
 hog_channel = models[9]
-heat_thresh = 1
+heat_thresh = 2.0
+# using a Heatmap class to keep track of detected objects in the past n frames 
+heatHistory = Heatmap(n = 30, shape = [720,1280])
 
 def vehDetect(image,lane_image, y_start_stops, xy_windows, xy_overlap, 
                      clf, X_scaler, cspace, spatial_size, hist_bins, orient, pix_per_cell, cell_per_block, hog_channel, 
@@ -85,6 +88,7 @@ def vehDetect(image,lane_image, y_start_stops, xy_windows, xy_overlap,
     '''
     the vehicle detection pipeline is implemented in this function
     '''
+    global heatHistory
     multi_hot_windows = []
 
     for xy_window,y_start_stop in zip(xy_windows,y_start_stops):
@@ -105,18 +109,20 @@ def vehDetect(image,lane_image, y_start_stops, xy_windows, xy_overlap,
 
     # Add heat to each box in box list
     heat = add_heat(heat,multi_hot_windows)
+    
+    avgHeat = heatHistory.add(heat)
 
     # Apply threshold to help remove false positives
-    heat = apply_threshold(heat,heat_thresh)
+    avgHeat = apply_threshold(avgHeat,heat_thresh)
 
     # Visualize the heatmap when displaying    
-    heatmap = np.clip(heat, 0, 255)
+    heatmap = np.clip(avgHeat, 0, 255)
 
     # Find final boxes from heatmap using label function
     labels = label(heatmap)
     draw_img = draw_labeled_bboxes(np.copy(lane_image), labels)
     
-    return windows, hot_windows, window_img, heat, heatmap, labels, draw_img
+    return windows, hot_windows, window_img, avgHeat, heatmap, labels, draw_img
 
 def img_annotation(raw_img):
     '''
@@ -131,6 +137,8 @@ def img_annotation(raw_img):
     
     global spatial_feat, hist_feat, hog_feat, y_start_stops, xy_windows, xy_overlap
     global clf, X_scaler, cspace, spatial_size, hist_bins, hist_range, orient, pix_per_cell, cell_per_block, hog_channel, heat_thresh
+    
+    global heatHistory, avgHeat
     
     # undistort the image
     undst_img = cv2.undistort(raw_img, mtx, dist, None, mtx)
@@ -168,7 +176,7 @@ def img_annotation(raw_img):
     img = addText(undst_lane_img, left_curverad, right_curverad, offset)
     
     # detect vehicles on the undistorted image
-    windows, hot_windows, window_img, heat, heatmap, labels, draw_img = vehDetect(image = undst_img, lane_image = img, 
+    windows, hot_windows, window_img, avgHeat, heatmap, labels, draw_img = vehDetect(image = undst_img, lane_image = img, 
                          y_start_stops = y_start_stops, xy_windows = xy_windows, xy_overlap = xy_overlap, 
                          clf = clf, X_scaler = X_scaler, cspace = cspace, spatial_size = spatial_size, hist_bins = hist_bins, 
                          orient = orient, pix_per_cell = pix_per_cell, cell_per_block = cell_per_block, hog_channel = hog_channel, 
