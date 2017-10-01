@@ -1,53 +1,176 @@
-#**Finding Lane Lines on the Road** 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+# **Finding Lane Lines on the Road** 
 
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
+## Summary
 
-Overview
+### This paper documented a Python pipeline finding lane lines from images and videos taken by a camera set in the front of the vehicle. This pipeline integrated image processing tools including color filter, Canny filer, and Hough transform, and it has been tested with images and videos. This is also a project of the Udacity Self-driving car Nanodegree.
+***
+
+The steps of this project are listed as follows:
+
+1. Make a pipeline with RGB color filter that finds lane lines on the road
+	* Test the pipeline with multiple images
+	* Test the pipeline with a video clip
+2. Improved the pipeline to fit lines along the extracted lane lines
+	* Test the improved pipeline with a video clip
+3. Apply HSV color filter in the pipeline for better line extraction
+	* Test the new pipeline with a video clip with more complex colors on the road surface
+
 ---
 
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
+## Reflection
+### 1. Pipelines
+#### 1.1 A simple pipeline with RGB color filter.
+In this pipeline, images taken from a camera set in front of a vehicle was loaded in RGB format by `matplotlib.image.imread()`. Notice that an image was loaded by `OpenCV cv2.imread()`, it would be in BGR format.
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
+My basic pipeline to extract lane lines is implemented as follows. This pipeline start with RGB color filter. Yellow pixels are selected by `cv2.inRange(img, colorLower[0], colorUpper[0])`, and white pixels are selected by `cv2.inRange(img, colorLower[1], colorUpper[1])`. A pixel mask was obtained by calculate the union of two colors by `cv2.bitwise_or()`. The original image was masked out using `cv2.bitwise_and()` with the mask. The masked-out image was converted to gray scale for Canny edge detection. A Gaussian blurring step was applied before Canny edge detection in order to enhance the results. Hough transform was applied to extract lines from results of Canny edge detection within a given region of interests. By default, the pipeline return an image with raw lane lines.
+```python
+def findLane(img, colorLower, colorUpper, cannyLow, cannyHigh, kernel_size, vertices, rho, theta, threshold, min_line_len, max_line_gap, fitLines = False):
 
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
+    # segment the image by RGB color
+    colorMask = cv2.bitwise_or(cv2.inRange(img, colorLower[0],colorUpper[0]), cv2.inRange(img, colorLower[1],colorUpper[1]))
+    maskedImg = cv2.bitwise_and(img,img,mask=colorMask)
+    # perform edge detection by canny filter
+    grayImg = grayscale(maskedImg)
+    gBlurImg = gaussian_blur(grayImg, kernel_size)
+    cannyImg = canny(gBlurImg,cannyLow, cannyHigh)
+    roiImg = region_of_interest(cannyImg, vertices)
+    # extract linear features with Hough filter, we can choose to use the raw line segments 
+    # or an averaged line of the raw segments
+    if fitLines==True:
+        # plot a averaged line of all filtered line segments
+        houghImg = hough_linesF(roiImg, rho, theta, threshold, min_line_len, max_line_gap,[vertices[0,1,0],vertices[0,0,0],vertices[0,3,0],vertices[0,2,0]])
+    else:
+        # plot filtered line segments
+        houghImg = hough_lines(roiImg, rho, theta, threshold, min_line_len, max_line_gap)
+    finalImg = weighted_img(houghImg, img, α=0.8, β=1., λ=0.)
+    
+    return finalImg`
+```
 
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+Parameters to extract raw lane lines are shown below
+```python
+colorLower = [np.uint8([180,180,180]), np.uint8([180,180,0])] # [lower_white,lower_yellow]
+colorUpper = [np.uint8([255,255,255]), np.uint8([255,255,224])] # [upper_white,upper_yellow]
 
+cannyLow = 200
+cannyHigh = 300
+    
+kernel_size = 9
+vertices = np.array([[[440,330], [150,530], [960, 530], [535,330]]],dtype = np.int32)
+rho = 1
+theta = np.pi/180
+threshold = 10
+min_line_len = 7
+max_line_gap = 7
+```
+One of the results tested on an image is shown below.
+![image 1](./test_images_output/solidWhiteRight.jpg "Test 1")
 
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
+A video with extracted raw line segments are 
+[Video - raw lane lines](https://youtu.be/TtkZxrApfTE?list=PLta4R4pjDkKjQNEMhN-nyWQwLel10RCol "video 1")
 
-1. Describe the pipeline
+If we call `findLane(...,fitLines = True), a line will be fitted for each lane line by the following function. Line segments were first extrated by OpenCV's `cv2.HoughLinesP()`. Slopes of these line segments were used to split segments of the left lane line from segments of the right lane line. For each lane line, segments with slopes near 0 degree and very short length were dropped as outliers. Points of segments with long segments and reasonable slopes were used to fit the lane lines.
+```python
+# Polyfit a line using all points
+def hough_linesF(img, rho, theta, threshold, min_line_len, max_line_gap,X):
+    """
+    `img` should be the output of a Canny transform.
+    Returns an image with FITTED hough lines drawn.
+    """
+    lines = cv2.HoughLinesP(img, rho, theta, threshold, np.array([]), minLineLength=min_line_len, maxLineGap=max_line_gap)
+    line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
+    # delete short segements and use the first frac% longest segments for polyfit
+    segLen = np.sqrt( (lines[:,:,3] - lines[:,:,1])**2 + (lines[:,:,2] - lines[:,:,0])**2 )
+    # seperate line segments by the slope:
+    # left segments are those with positive slope, right segments are those with negative slpe
+    # calculate [slope ,intercept] for each segment
+    segP = np.hstack([ (lines[:,:,3]-lines[:,:,1])/(lines[:,:,2]-lines[:,:,0]), # slope
+                     lines[:,:,1]-lines[:,:,0]*(lines[:,:,3]-lines[:,:,1])/(lines[:,:,2]-lines[:,:,0]) ])  # intercept
+    # remove lines with slopes in [-h,h]
+    h = 25
+    lines = lines[(segP[:,0]>(0+np.pi/180*h)) | (segP[:,0]<(0-np.pi/180*h))]
+    segP = segP[(segP[:,0]>(0+np.pi/180*h)) | (segP[:,0]<(0-np.pi/180*h))]
+    # average coefficients for the left and right line segments
+    leftLines = lines[segP[:,0]<0]
+    rightLines = lines[segP[:,0]>0]
+    # use only the first frac% longest segments for polyfit
+    segLen = np.sqrt( (lines[:,:,3] - lines[:,:,1])**2 + (lines[:,:,2] - lines[:,:,0])**2 )
+    # select the longest frac% segments to calculate the average slope and
+    leftSegLen = segLen[segP[:,0]<0]
+    rightSegLen = segLen[segP[:,0]>0]
+    # sort segment length and calculate the average slope and intercept using the top frac% longest segments
+    frac = 0.85
+    nLeftSeg = np.amax([1,np.int32(np.round(len(leftLines)*frac))])
+    leftLines = leftLines[leftSegLen[:,0].argsort()[-nLeftSeg:]]
+    nRightSeg = np.amax([1,np.int32(np.round(len(rightLines)*frac))])
+    rightLines = rightLines[rightSegLen[:,0].argsort()[-nRightSeg:]]
 
-2. Identify any shortcomings
+    # build x,y arrays for each line for np.polyfit
+    leftX, leftY = (np.vstack([leftLines[:,:,0], leftLines[:,:,2]]).squeeze(), 
+                   np.vstack([leftLines[:,:,1],leftLines[:,:,3]]).squeeze())
+    rightX, rightY = (np.vstack([rightLines[:,:,0], rightLines[:,:,2]]).squeeze(), 
+                      np.vstack([rightLines[:,:,1],rightLines[:,:,3]]).squeeze())
 
-3. Suggest possible improvements
+    # polyfit the line order = 1
+    leftP, rightP = np.polyfit(leftX, leftY,1), np.polyfit(rightX, rightY,1)
+    # calculate lines 
+    interpLeftX, interpRightX = np.int32(list(range(X[0],X[1]))), np.int32(list(range(X[2],X[3])))
+    # calculate the interpolated lines
+    interpLeftY, interpRightY = ( np.int32(np.round(leftP[0]*interpLeftX+leftP[1])),
+                                  np.int32(np.round(rightP[0]*interpRightX+rightP[1])) )
 
-We encourage using images in your writeup to demonstrate how your pipeline works.  
+    # generate lines for draw_lines() function
+    interpLeftLines, interpRightLines = np.stack([interpLeftX[0:-1], interpLeftY[0:-1], interpLeftX[1:], interpLeftY[1:]], axis=1), \
+                                        np.stack([interpRightX[0:-1], interpRightY[0:-1], interpRightX[1:], interpRightY[1:]], axis=1)
+    fittedLines = np.vstack([interpLeftLines,interpRightLines])
+    fittedLines = fittedLines[:,np.newaxis,:]
+    # draw the fitted lines on the original image
+    draw_lines(line_img, fittedLines,thickness = 10)
 
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
+    return line_img
+```
+Results of fitted lines are show below.
+![image 1](./test_images_output/fittedLinessolidWhiteRight.jpg "Test 1")
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
+A video with fitted lines are at 
+[Video - fitted lane lines](https://youtu.be/HkmnJuTBNxM?list=PLta4R4pjDkKjQNEMhN-nyWQwLel10RCol "video 2")
 
+#### 1.2 An improved pipeline with HSV color filter.
+Color-based filtering is probably the most important step to precisely extract the lane lines. The RGB color-based filter documented above can easily extract white and yellow lane lines from the dark bituminous road surface. However, color-based filter in the RGB space is inprecise to extract yellow lane line from light concrete road surface as shown bellow. Hence, the color-based filter must be done in the HSV space, where the color and insensity content of image pixels can be seperated more precisely.
+![image 3](./test_videos/challenge-thumbnail.png "Test 3")
 
-The Project
----
+The only improvement is to add OpenCV's color space conversion function at the beginning of the simple pipeline, and use the converted HSV image in the color-based filter as follows
+```python
+# convert RGB to HSV for better color-based segmentation
+hsvImg = cv2.cvtColor(img,cv2.COLOR_RGB2HSV)
+# segment the image by HSV color
+colorMask = cv2.bitwise_or(cv2.inRange(hsvImg, colorLower[0],colorUpper[0]), cv2.inRange(hsvImg, colorLower[1],colorUpper[1]))
+maskedImg = cv2.bitwise_and(img,img,mask=colorMask)
+```
+Results of this new pipeline on the challenge video is
+[Video - hsv lane lines](https://youtu.be/DDO1apuojZc?list=PLta4R4pjDkKjQNEMhN-nyWQwLel10RCol "video 3")
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+Parameters used for this video are
+```python
+# HSV colors
+colorLower = [np.uint8([0,0,210]), np.uint8([20,85,150])] # [lower_white,lower_yellow]
+colorUpper = [np.uint8([255,25,255]), np.uint8([25,255,255])] # [upper_white,upper_yellow]
 
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/83ec35ee-1e02-48a5-bdb7-d244bd47c2dc/lessons/8c82408b-a217-4d09-b81d-1bda4c6380ef/concepts/4f1870e0-3849-43e4-b670-12e6f2d4b7a7) if you haven't already.
+cannyLow = 120
+cannyHigh = 180
 
-**Step 2:** Open the code in a Jupyter Notebook
+kernel_size = 9
+vertices = np.array([[[600,440], [240,660], [1100, 660], [740,440]]],dtype = np.int32)
+rho = 1
+theta = np.pi/180
+threshold = 17
+min_line_len = 7
+max_line_gap = 7
+```
+### 2. Identify potential shortcomings with your current pipeline
 
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out <A HREF="https://www.packtpub.com/books/content/basics-jupyter-notebook-and-python" target="_blank">Cyrille Rossant's Basics of Jupyter Notebook and Python</A> to get started.
+There are three major shortcomings in the current pipeline. First, all parameters are not automatically adjusted to the input image. If the input image quality varies significantly, this algorithm is probably not robust enough to handle them. Second, the current pipeline fit a line to road lane marks. This works fine when the curvature of the road can be approximated by lines within the given ROI. However, this solution cannot handle sharp turnings. Finally, the current lines are fitted lines are sensitive to outlier segments, whose slopes are significantly different from the correct lane line.
 
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
+### 3. Suggest possible improvements to your pipeline
 
-`> jupyter notebook`
-
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
-
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
-
+With respect to shortcomings dicussed in the previous section, a possible improvement would be to explore a 'smart' algorithm to automatically determine parameters, such as thresholds for Canny detector and Hough transform, and ROI. Another potential improvement could be to apply a curve fitting algorithm that is robust to outlier segments
