@@ -12,7 +12,7 @@
 
 | <img src="./output_images/video_thumbnail.png" width = 250> |
 | :--------------------------------------: |
-| [Youtube Link](https://youtu.be/Tj3xsN6FeUo) |
+| [Youtube Link](https://youtu.be/qRCzv7YoUtU) |
 
 ---
 ### Quick Start
