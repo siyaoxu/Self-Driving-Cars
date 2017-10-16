@@ -61,7 +61,7 @@ hog_feat = True # HOG features on or off
 # xy_overlap = (0.8,0.8)
 y_start_stops = [[400, 500],[420, 550],[450, 600],[480, None]] # Min and max in y to search in slide_window()
 xy_windows = [(60,60),(70,70),(100,100),(130,130)]
-xy_overlap = (0.7,0.7)
+xy_overlap = (0.75,0.75)
 
 # load the svc classifier
 with warnings.catch_warnings():
@@ -78,9 +78,9 @@ orient = models[6]
 pix_per_cell = models[7]
 cell_per_block = models[8]
 hog_channel = models[9]
-heat_thresh = 2.0
+heat_thresh = 3.0
 # using a Heatmap class to keep track of detected objects in the past n frames 
-heatHistory = Heatmap(n = 30, shape = [720,1280])
+heatHistory = Heatmap(n = 50, shape = [720,1280])
 
 def vehDetect(image,lane_image, y_start_stops, xy_windows, xy_overlap, 
                      clf, X_scaler, cspace, spatial_size, hist_bins, orient, pix_per_cell, cell_per_block, hog_channel, 
