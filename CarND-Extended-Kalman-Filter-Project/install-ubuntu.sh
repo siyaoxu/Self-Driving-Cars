@@ -1,7 +1,7 @@
 #! /bin/bash
 sudo apt-get update
 sudo apt-get install git libuv1-dev libssl-dev gcc g++ cmake make
-git clone https://github.com/uWebSockets/uWebSockets 
+sudo git clone https://github.com/uNetworking/uWebSockets.git
 cd uWebSockets
 git checkout e94b6e1
 mkdir build
