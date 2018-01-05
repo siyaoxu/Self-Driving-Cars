@@ -67,6 +67,9 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+  MatrixXd R_laser;
+  MatrixXd R_radar;
+  MatrixXd H_laser;
 
   /**
    * Constructor
@@ -89,6 +92,10 @@ public:
    * matrix
    * @param delta_t Time between k and k+1 in s
    */
+
+  // Normalize angles to [-pi,pi]
+  void NormAngle(double& angle);
+
   void Prediction(double delta_t);
 
   /**
