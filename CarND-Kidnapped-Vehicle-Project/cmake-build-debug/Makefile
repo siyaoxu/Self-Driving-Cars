@@ -55,17 +55,6 @@ CMAKE_BINARY_DIR = C:\workspace\solution_repos\udacity\CarND\CarND-Kidnapped-Veh
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	"C:\Program Files\JetBrains\CLion 2017.2.3\bin\cmake\bin\cmake.exe" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -76,6 +65,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	"C:\Program Files\JetBrains\CLion 2017.2.3\bin\cmake\bin\cmake.exe" -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -110,17 +110,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named CarND_Kidnapped_Vehicle_Project
+# Target rules for targets named particle_filter
 
 # Build rule for target.
-CarND_Kidnapped_Vehicle_Project: cmake_check_build_system
-	$(MAKE) -f CMakeFiles\Makefile2 CarND_Kidnapped_Vehicle_Project
-.PHONY : CarND_Kidnapped_Vehicle_Project
+particle_filter: cmake_check_build_system
+	$(MAKE) -f CMakeFiles\Makefile2 particle_filter
+.PHONY : particle_filter
 
 # fast build rule for target.
-CarND_Kidnapped_Vehicle_Project/fast:
-	$(MAKE) -f CMakeFiles\CarND_Kidnapped_Vehicle_Project.dir\build.make CMakeFiles/CarND_Kidnapped_Vehicle_Project.dir/build
-.PHONY : CarND_Kidnapped_Vehicle_Project/fast
+particle_filter/fast:
+	$(MAKE) -f CMakeFiles\particle_filter.dir\build.make CMakeFiles/particle_filter.dir/build
+.PHONY : particle_filter/fast
 
 src/main.obj: src/main.cpp.obj
 
@@ -128,7 +128,7 @@ src/main.obj: src/main.cpp.obj
 
 # target to build an object file
 src/main.cpp.obj:
-	$(MAKE) -f CMakeFiles\CarND_Kidnapped_Vehicle_Project.dir\build.make CMakeFiles/CarND_Kidnapped_Vehicle_Project.dir/src/main.cpp.obj
+	$(MAKE) -f CMakeFiles\particle_filter.dir\build.make CMakeFiles/particle_filter.dir/src/main.cpp.obj
 .PHONY : src/main.cpp.obj
 
 src/main.i: src/main.cpp.i
@@ -137,7 +137,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) -f CMakeFiles\CarND_Kidnapped_Vehicle_Project.dir\build.make CMakeFiles/CarND_Kidnapped_Vehicle_Project.dir/src/main.cpp.i
+	$(MAKE) -f CMakeFiles\particle_filter.dir\build.make CMakeFiles/particle_filter.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -146,7 +146,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) -f CMakeFiles\CarND_Kidnapped_Vehicle_Project.dir\build.make CMakeFiles/CarND_Kidnapped_Vehicle_Project.dir/src/main.cpp.s
+	$(MAKE) -f CMakeFiles\particle_filter.dir\build.make CMakeFiles/particle_filter.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 src/particle_filter.obj: src/particle_filter.cpp.obj
@@ -155,7 +155,7 @@ src/particle_filter.obj: src/particle_filter.cpp.obj
 
 # target to build an object file
 src/particle_filter.cpp.obj:
-	$(MAKE) -f CMakeFiles\CarND_Kidnapped_Vehicle_Project.dir\build.make CMakeFiles/CarND_Kidnapped_Vehicle_Project.dir/src/particle_filter.cpp.obj
+	$(MAKE) -f CMakeFiles\particle_filter.dir\build.make CMakeFiles/particle_filter.dir/src/particle_filter.cpp.obj
 .PHONY : src/particle_filter.cpp.obj
 
 src/particle_filter.i: src/particle_filter.cpp.i
@@ -164,7 +164,7 @@ src/particle_filter.i: src/particle_filter.cpp.i
 
 # target to preprocess a source file
 src/particle_filter.cpp.i:
-	$(MAKE) -f CMakeFiles\CarND_Kidnapped_Vehicle_Project.dir\build.make CMakeFiles/CarND_Kidnapped_Vehicle_Project.dir/src/particle_filter.cpp.i
+	$(MAKE) -f CMakeFiles\particle_filter.dir\build.make CMakeFiles/particle_filter.dir/src/particle_filter.cpp.i
 .PHONY : src/particle_filter.cpp.i
 
 src/particle_filter.s: src/particle_filter.cpp.s
@@ -173,7 +173,7 @@ src/particle_filter.s: src/particle_filter.cpp.s
 
 # target to generate assembly for a file
 src/particle_filter.cpp.s:
-	$(MAKE) -f CMakeFiles\CarND_Kidnapped_Vehicle_Project.dir\build.make CMakeFiles/CarND_Kidnapped_Vehicle_Project.dir/src/particle_filter.cpp.s
+	$(MAKE) -f CMakeFiles\particle_filter.dir\build.make CMakeFiles/particle_filter.dir/src/particle_filter.cpp.s
 .PHONY : src/particle_filter.cpp.s
 
 # Help Target
@@ -182,9 +182,9 @@ help:
 	@echo ... all (the default if no target is provided)
 	@echo ... clean
 	@echo ... depend
-	@echo ... rebuild_cache
-	@echo ... CarND_Kidnapped_Vehicle_Project
+	@echo ... particle_filter
 	@echo ... edit_cache
+	@echo ... rebuild_cache
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s

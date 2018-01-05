@@ -127,7 +127,7 @@ CMAKE_OBJCOPY:FILEPATH=C:/MinGW/bin/objcopy.exe
 CMAKE_OBJDUMP:FILEPATH=C:/MinGW/bin/objdump.exe
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=CarND_Kidnapped_Vehicle_Project
+CMAKE_PROJECT_NAME:STATIC=PARTICLE_FILTER
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=C:/MinGW/bin/ranlib.exe
