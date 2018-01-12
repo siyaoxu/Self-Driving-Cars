@@ -1,3 +1,58 @@
+# Reflection
+---
+This is my implementation of the PID controller project for the Udacity Self-Driving Cars nanodegree.
+
+## Project Files
+My PID controllers are implemented in 
+
+```d
+- ./src/main.cpp
+- ./src/PID.cpp
+- ./src/PID.h
+```
+A video recorded the results in the simulator is stored at [here](https://youtu.be/OjSdukz44Go).
+
+## Implementation
+My implementation includes a [PID controller model](https://www.youtube.com/watch?time_continue=2&v=Ag8H3Iit9j4) for the steer value and a throttle value model based on the current vehicle angle and the steering angle.
+
+### P, I, D Components
+
+In a PID controller, the steering value is calculated as a weighted average of three components. Functions of all three components are discussed below:
+
+|    Component     | Effect                                   |
+| :--------------: | :--------------------------------------- |
+| Proportional (P) | This is the major component. The steer value is in proportion to the cross track error (CTE). A large CTE indicates a large steering value. This component a long will overshoot and leads to oscillating traces. As shown below, the blue curve is the path of a P controller with system errors. |
+| Differential (D) | Take the changing rate of CTE into consideration, which can prevent the oscillation around the expected path if the coefficient is tuned appropriately. The yellow curve in the figure is the path of a PD controller with system errors. |
+|   Integral (I)   | The integral term is the sum of CTE at every step, which helps minimized potential system error from the expected path. As shown by the green dashline below, the PID controller can compensation system error. |
+
+
+<img src="./img/PID controller.PNG" width = 250>
+
+
+Coefficients for the components of both models were manually determined, but the '[twiddling](https://www.youtube.com/watch?time_continue=4&v=2uQ2BSzDvXs)' strategy introduced in the lecture was used. Final coefficients for each components are 
+
+| Component | Coefficient value |
+| :-------: | :---------------- |
+|     P     | 2e-1              |
+|     I     | 7.5e-7            |
+|     D     | 1.35267e0         |
+
+### Throttle Value Controller
+
+The throttle value in this implementation is calculated using magnitudes of the steering angle and the current heading angle of the vehicle. My assumption is that the larger either of these angles are, the lower our throttle should be to avoid deviations from the expected path. The mathematical representation of this model is shown below
+
+**throttle_value = 1.0 - (1.3 x |steer_value|/50 + 0.7 x |angle| / 25)**
+* Steering_value and angle are in degrees
+* 50 and 25 are ranges of the variables respectively
+* Different weights determine effects of variables. It is better to assign a higher weight to steer_value, so the vehicle will reduce throttle magnitude to avoid turning with high momentum
+
+
+
+
+---
+---
+**Readme By Udacity**
+
 # CarND-Controls-PID
 Self-Driving Car Engineer Nanodegree Program
 

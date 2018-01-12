@@ -2,6 +2,8 @@
 #define PID_H
 
 class PID {
+private:
+    bool initStep=true;
 public:
   /*
   * Errors
@@ -9,6 +11,7 @@ public:
   double p_error;
   double i_error;
   double d_error;
+  double prev_perr;
 
   /*
   * Coefficients
@@ -30,7 +33,7 @@ public:
   /*
   * Initialize PID.
   */
-  void Init(double Kp, double Ki, double Kd);
+  void Init( double Kp, double Ki, double Kd);
 
   /*
   * Update the PID error variables given cross track error.
