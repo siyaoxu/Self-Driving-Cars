@@ -10,7 +10,15 @@ My PID controllers are implemented in
 - ./src/PID.cpp
 - ./src/PID.h
 ```
+<<<<<<< HEAD
 A video recorded the results in the simulator is stored at [here](https://youtu.be/OjSdukz44Go).
+=======
+A video recorded the results in the simulator is stored as 
+
+```
+./Video.mp4
+```
+>>>>>>> 6542ed0a50f8c3e7a5c12a17ffe9679cbbaf44d0
 
 ## Implementation
 My implementation includes a [PID controller model](https://www.youtube.com/watch?time_continue=2&v=Ag8H3Iit9j4) for the steer value and a throttle value model based on the current vehicle angle and the steering angle.
