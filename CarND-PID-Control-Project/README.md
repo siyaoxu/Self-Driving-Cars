@@ -10,15 +10,8 @@ My PID controllers are implemented in
 - ./src/PID.cpp
 - ./src/PID.h
 ```
-<<<<<<< HEAD
-A video recorded the results in the simulator is stored at [here](https://youtu.be/OjSdukz44Go).
-=======
-A video recorded the results in the simulator is stored as 
 
-```
-./Video.mp4
-```
->>>>>>> 6542ed0a50f8c3e7a5c12a17ffe9679cbbaf44d0
+A video recorded the results in the simulator is stored at [here](https://youtu.be/OjSdukz44Go).
 
 ## Implementation
 My implementation includes a [PID controller model](https://www.youtube.com/watch?time_continue=2&v=Ag8H3Iit9j4) for the steer value and a throttle value model based on the current vehicle angle and the steering angle.
@@ -34,7 +27,7 @@ In a PID controller, the steering value is calculated as a weighted average of t
 |   Integral (I)   | The integral term is the sum of CTE at every step, which helps minimized potential system error from the expected path. As shown by the green dashline below, the PID controller can compensation system error. |
 
 
-<img src="./img/PID controller.PNG" width = 250>
+<img src="./img/PID controller.PNG" width = 350>
 
 
 Coefficients for the components of both models were manually determined, but the '[twiddling](https://www.youtube.com/watch?time_continue=4&v=2uQ2BSzDvXs)' strategy introduced in the lecture was used. Final coefficients for each components are 
