@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2017.2.3\bin\cmake\bin\cmake.exe" -E remove -f CMakeFiles\mpc.dir/objects.a
+C:\MinGW\bin\ar.exe cr CMakeFiles\mpc.dir/objects.a @CMakeFiles\mpc.dir\objects1.rsp
+C:\MinGW\bin\g++.exe -Wall -g   -Wl,--whole-archive CMakeFiles\mpc.dir/objects.a -Wl,--no-whole-archive  -o mpc.exe -Wl,--out-implib,libmpc.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\mpc.dir\linklibs.rsp
