@@ -1,4 +1,52 @@
-# CarND-Controls-MPC
+## How to use
+Clone the repository and run following commands
+
+```shell
+mkdir build && cd build
+cmake .. && make
+./mpc
+```
+
+Then start the simulator, and select **Project 5: MPC Controller**. The vehicle will drive in the autonomous model.
+
+
+## The Vehicle Model
+* The vehicle state is described by six variables: **x position, y position, vehicle orientation, vehicle speed, cte, psi**
+* and two actuator variables: **steer angle, accelaration**
+* The vehicle state and actuator variables are updated by following equations:
+  * x_t+1 = x_t + v_t * cos(psi_t) * dt
+  * y_t+1 = y_t + v_t * sin(psi_t) * dt  
+  * psi_t+1 = psi_t + v_t / Lf * steer_angle * dt
+  * v_t+1 = v_t + a_t * dt
+
+
+## Time Steps (N) and Time Step Interval (dt)
+* N=10 and dt=0.1 have outperformed other values, and are chosen for my implementation
+* Other combinations tested for this project are (N=10, dt=0.05), (N=15, dt=0.05), (N=10, dt=0.08), (N=15, dt=0.08)
+
+
+## Preprocess
+* The given road points, which were in map coordinates, were converted to the vehicle coordinates to simplify the calculation
+
+
+## The Loss Function
+* Weights of each term of the loss function is the key to the performance of a MPC controller
+* The chosen weights for this implementation are: 
+  * w_cte: 1.5
+  * w_epsi: 2000
+  * w_v: 2
+  * w_steer: 2000
+  * w_throttle: 5
+  * w_steer_seq: 2000
+  * w_throttle_seq: 2
+
+
+## The Latency
+The required latency of this project is 100 ms, which is taken cared by setting the values of the actuator variables at t to two time steps back (t-2). 
+
+---
+
+# the Original CarND-Controls-MPC by Udacity
 Self-Driving Car Engineer Nanodegree Program
 
 ---
