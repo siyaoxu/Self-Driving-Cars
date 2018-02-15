@@ -8,7 +8,7 @@ using CppAD::AD;
 // TODO: Set the timestep length and duration
 const size_t N = 10;
 const double dt = 0.1;
-const double ref_v = 100; // referrence speed
+const double ref_v = 80; // referrence speed
 const double ref_cte = 0;
 const double ref_epsi = 0;
 
@@ -37,28 +37,23 @@ public:
         // NOTE: You'll probably go back and forth between this function and
         // the Solver function below.
         // to the cost function
-        cout<<"In FG_eval(). vars is "<<vars<<endl;
         fg[0] = 0;
-        cout<<"In FG_eval(). fg[0] is "<<fg[0]<<endl;
         // The part of the cost based on the reference state.
         for (unsigned t = 0; t < N; t++) {
-            fg[0] += CppAD::pow(vars[cte_start + t]-ref_cte, 2);
-            fg[0] += CppAD::pow(vars[epsi_start + t]-ref_epsi, 2);
-            fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
+            fg[0] += 1.5*CppAD::pow(vars[cte_start + t]-ref_cte, 2);
+            fg[0] += 2000*CppAD::pow(vars[epsi_start + t]-ref_epsi, 2);
+            fg[0] += 2*CppAD::pow(vars[v_start + t] - ref_v, 2);
         }
-        cout<<"In FG_eval(). fg[0] is "<<fg[0]<<endl;
         // Minimize the use of actuators.
         for (unsigned t = 0; t < N - 1; t++) {
-            fg[0] += CppAD::pow(vars[delta_start + t], 2);
-            fg[0] += CppAD::pow(vars[a_start + t], 2);
+            fg[0] += 2000*CppAD::pow(vars[delta_start + t], 2);
+            fg[0] += 5*CppAD::pow(vars[a_start + t], 2);
         }
-        cout<<"In FG_eval(). fg[0] is "<<fg[0]<<endl;
         // Minimize the value gap between sequential actuations.
         for (unsigned t = 0; t < N - 2; t++) {
-            fg[0] += CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-            fg[0] += CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+            fg[0] += 2000*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+            fg[0] += 2*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
         }
-        cout<<"In FG_eval(). fg[0] is "<<fg[0]<<endl;
         //
         // Setup Constraints
         //
@@ -92,6 +87,10 @@ public:
             AD<double> delta0 = vars[delta_start + t - 1];
             AD<double> a0 = vars[a_start + t - 1];
 
+            if (t>3){
+                a0 = vars[a_start + t - 4];
+                delta0 = vars[delta_start + t - 4];
+            }
             AD<double> f0 = coeffs[0] + coeffs[1] * x0
                             + coeffs[2] * x0*x0
                             + coeffs[3] * x0*x0*x0;
@@ -240,7 +239,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     // Check some of the solution values
     bool ok = true;
     ok &= solution.status == CppAD::ipopt::solve_result<Dvector>::success;
-    cout<<"Is the optimization success? "<<ok<<endl;
+//    cout<<"Is the optimization success? "<<ok<<endl;
 //  cout<<solution.x<<endl;
     // Cost
     auto cost = solution.obj_value;

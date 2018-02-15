@@ -99,7 +99,7 @@ int main() {
                     * Both are in between [-1, 1].
                     *
                     */
-                    v*=0.447;
+//                    v*=0.447;
                     int Npt = ptsx.size();
                     Eigen::VectorXd vecsx(Npt);
                     Eigen::VectorXd vecsy(Npt);
@@ -116,23 +116,21 @@ int main() {
                     Eigen::VectorXd coeffs = polyfit(vecsx,vecsy,3);
                     double cte = polyeval(coeffs, 0) - 0;
                     double epsi = - atan(coeffs[1]);;
-                    cout<<"***********"<<endl;
-                    cout<< cte<<" "<<epsi<<endl;
+            
                     Eigen::VectorXd state(6);
                     state << 0,0,0,v,cte,epsi;
 //          state << pxdt,pydt,psidt,vdt,cte,epsi;
                     std::vector<double> newState = mpc.Solve(state,coeffs);
-                    cout<<"a new state is calculated"<<endl;
-                    double steer_value = j[1]["steering_angle"];
-                    double throttle_value = j[1]["throttle"];
-                    steer_value = newState[0]/(deg2rad(25)*Lf);
-                    throttle_value = newState[1];
-                    cout<<"**********"<<endl;
-                    cout<<newState[0]<<" "<<newState[1]<<" "<<newState[2]<<" "<<newState[3]<<" "<<endl;
+            
+//                    double steer_value = j[1]["steering_angle"];
+//                    double throttle_value = j[1]["throttle"];
+                    double steer_value = newState[0]/deg2rad(25);
+                    double throttle_value = newState[1];
+            
                     json msgJson;
                     // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
                     // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-                    msgJson["steering_angle"] = -steer_value;
+                    msgJson["steering_angle"] = steer_value;
                     msgJson["throttle"] = throttle_value;
 
                     //Display the MPC predicted trajectory
@@ -146,8 +144,14 @@ int main() {
                     msgJson["mpc_y"] = mpc_y_vals;
 
                     //Display the waypoints/reference line
-                    vector<double> next_x_vals(ptsx_veh);
-                    vector<double> next_y_vals(ptsy_veh);
+//                    vector<double> next_x_vals(ptsx_veh);
+//                    vector<double> next_y_vals(ptsy_veh);
+                    vector<double> next_x_vals;
+                    vector<double> next_y_vals;
+                    for (int i=0;i<100;i+=3){
+                        next_x_vals.push_back(i);
+                        next_y_vals.push_back(polyeval(coeffs,i));
+                    }
 
                     //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
                     // the points in the simulator are connected by a Yellow line

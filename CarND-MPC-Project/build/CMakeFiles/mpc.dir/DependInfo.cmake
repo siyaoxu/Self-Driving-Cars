@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/mnt/c/workspace/solution_repos/udacity/CarND/CarND-MPC-Project/src/MPC.cpp" "/mnt/c/workspace/solution_repos/udacity/CarND/CarND-MPC-Project/build/CMakeFiles/mpc.dir/src/MPC.cpp.o"
-  "/mnt/c/workspace/solution_repos/udacity/CarND/CarND-MPC-Project/src/main.cpp" "/mnt/c/workspace/solution_repos/udacity/CarND/CarND-MPC-Project/build/CMakeFiles/mpc.dir/src/main.cpp.o"
+  "/mnt/d/workspace/Self-Driving-Cars/CarND-MPC-Project/src/MPC.cpp" "/mnt/d/workspace/Self-Driving-Cars/CarND-MPC-Project/build/CMakeFiles/mpc.dir/src/MPC.cpp.o"
+  "/mnt/d/workspace/Self-Driving-Cars/CarND-MPC-Project/src/main.cpp" "/mnt/d/workspace/Self-Driving-Cars/CarND-MPC-Project/build/CMakeFiles/mpc.dir/src/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
