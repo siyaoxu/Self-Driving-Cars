@@ -28,4 +28,10 @@ Implement a pipeline to detect vehicles in a video footnote. The pipeline includ
 
 <img src="https://github.com/siyaoxu/Self-Driving-Cars/blob/master/CarND-Vehicle-Detection/output_images/video_thumbnail.png" width = 400>
 
-### Term 2 - working on it
+### Term 2
+
+#### Project 1 - 3: [Extended Kalman Filter](https://github.com/siyaoxu/Self-Driving-Cars/tree/master/CarND-Extended-Kalman-Filter-Project), [Unscented Kalman Filter](https://github.com/siyaoxu/Self-Driving-Cars/tree/master/CarND-Unscented-Kalman-Filter-Project), [Particle Filter](https://github.com/siyaoxu/Self-Driving-Cars/tree/master/CarND-Kidnapped-Vehicle-Project)
+Implement Bayesian filters with C++ for data fusion.
+
+#### Project 4 - 5: [PID Control](https://github.com/siyaoxu/Self-Driving-Cars/tree/master/CarND-PID-Control-Project) and [Model Predictive Control](https://github.com/siyaoxu/Self-Driving-Cars/tree/master/CarND-MPC-Project)
+Implement two control systems: PID control and MPC control to keep vehicles driving on expected path. The results can be approached at [here for PID](https://www.youtube.com/watch?v=OjSdukz44Go&feature=youtu.be) and [here for MPC](https://youtu.be/DjfHubgWDHA)
