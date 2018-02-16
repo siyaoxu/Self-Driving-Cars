@@ -33,16 +33,18 @@ Then start the simulator, and select **Project 5: MPC Controller**. The vehicle 
 * Weights of each term of the loss function is the key to the performance of a MPC controller
 * The chosen weights for this implementation are: 
   * w_cte: 1.5
-  * w_epsi: 2000
+  * w_epsi: 1000
   * w_v: 2
-  * w_steer: 2000
+  * w_steer: 3000
   * w_throttle: 5
-  * w_steer_seq: 2000
+  * w_steer_seq: 1500
   * w_throttle_seq: 2
 
 
 ## The Latency
-The required latency of this project is 100 ms, which is taken cared by setting the values of the actuator variables at t to two time steps back (t-2). 
+The required latency of this project is 100 ms, which can be mitigated by two options:
+  * Delaying the actuator variables two time steps back (assigning t-2 to t), which requires the latency to be a multiple of dt in MPC
+  * Predicting the vehicle state before sending it to MPC.Solve() for the period of the latency. This solution is chosen for this implementation (Line 122 - Line 128, main.cpp)
 
 ---
 
