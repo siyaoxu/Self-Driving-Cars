@@ -29,7 +29,15 @@ public:
     // Fitted polynomial coefficients
     Eigen::VectorXd coeffs;
     FG_eval(Eigen::VectorXd coeffs) { this->coeffs = coeffs; }
-
+    
+    const double w_cte = 1.5;
+    const double w_epsi = 1000;
+    const double w_v = 2;
+    const double w_delta = 3000;
+    const double w_a = 5;
+    const double w_delta_seq = 1500;
+    const double w_a_seq = 2;
+    
     typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
     void operator()(ADvector& fg, const ADvector& vars) {
         // TODO: implement MPC
@@ -40,19 +48,19 @@ public:
         fg[0] = 0;
         // The part of the cost based on the reference state.
         for (unsigned t = 0; t < N; t++) {
-            fg[0] += 1.5*CppAD::pow(vars[cte_start + t]-ref_cte, 2);
-            fg[0] += 2000*CppAD::pow(vars[epsi_start + t]-ref_epsi, 2);
-            fg[0] += 2*CppAD::pow(vars[v_start + t] - ref_v, 2);
+            fg[0] += w_cte*CppAD::pow(vars[cte_start + t]-ref_cte, 2);
+            fg[0] += w_epsi*CppAD::pow(vars[epsi_start + t]-ref_epsi, 2);
+            fg[0] += w_v*CppAD::pow(vars[v_start + t] - ref_v, 2);
         }
         // Minimize the use of actuators.
         for (unsigned t = 0; t < N - 1; t++) {
-            fg[0] += 2000*CppAD::pow(vars[delta_start + t], 2);
-            fg[0] += 5*CppAD::pow(vars[a_start + t], 2);
+            fg[0] += w_delta*CppAD::pow(vars[delta_start + t], 2);
+            fg[0] += w_a*CppAD::pow(vars[a_start + t], 2);
         }
         // Minimize the value gap between sequential actuations.
         for (unsigned t = 0; t < N - 2; t++) {
-            fg[0] += 2000*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-            fg[0] += 2*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+            fg[0] += w_delta_seq*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+            fg[0] += w_a_seq*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
         }
         //
         // Setup Constraints
@@ -87,10 +95,10 @@ public:
             AD<double> delta0 = vars[delta_start + t - 1];
             AD<double> a0 = vars[a_start + t - 1];
 
-            if (t>3){
-                a0 = vars[a_start + t - 4];
-                delta0 = vars[delta_start + t - 4];
-            }
+//            if (t>3){
+//                a0 = vars[a_start + t - 4];
+//                delta0 = vars[delta_start + t - 4];
+//            }
             AD<double> f0 = coeffs[0] + coeffs[1] * x0
                             + coeffs[2] * x0*x0
                             + coeffs[3] * x0*x0*x0;
@@ -173,8 +181,8 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     // degrees (values in radians).
     // NOTE: Feel free to change this to something else.
     for (unsigned i = delta_start; i < a_start; i++) {
-        vars_lowerbound[i] = -0.436332*Lf;
-        vars_upperbound[i] = 0.436332*Lf;
+        vars_lowerbound[i] = -0.436332;
+        vars_upperbound[i] = 0.436332;
     }
 
     // Acceleration/decceleration upper and lower limits.
